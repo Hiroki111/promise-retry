@@ -40,22 +40,26 @@ test('tryPromise calls an async only once if the number of attempt is smaller th
   expect(asyncFunc).toHaveBeenCalledTimes(1);
 });
 
-test('tryPromise handles an async function which will be reject', async () => {
+test('tryPromise handles an async function which will be rejected', async () => {
   let asyncFunc = jest.fn();
   asyncFunc.mockImplementation((): Promise<void> => Promise.reject('e'));
 
   try {
     await tryPromise(asyncFunc, 3);
-  } catch (error) {}
-  expect(asyncFunc).toHaveBeenCalledTimes(3);
+  } catch (error) {
+    expect(asyncFunc).toHaveBeenCalledTimes(3);
+    expect(error).toBe('e');
+  }
 
   asyncFunc = jest.fn();
   asyncFunc.mockImplementation((): Promise<void> => Promise.reject('e'));
 
   try {
     await tryPromise(() => asyncFunc(1, 2, 3), 10);
-  } catch (error) {}
-  expect(asyncFunc).toHaveBeenCalledTimes(10);
+  } catch (error) {
+    expect(asyncFunc).toHaveBeenCalledTimes(10);
+    expect(error).toBe('e');
+  }
 });
 
 test('tryPromise handles an async function which will be resolved at the n-th attempt', async () => {
